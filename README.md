@@ -16,10 +16,28 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
   - temperatura e umidità correnti, setpoint del programma attivo;
   - preset `comfort` / `eco` / `standby`, e modo `auto` (segue la programmazione);
   - `heat` o `cool` in base al modo inverno/estate del gateway, `off` se la stanza è disabilitata.
+  - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
+  - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
 - Sensori temperatura e umidità per stanza.
 - Polling ogni 60 s di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`.
 
+## Esempio di card
+La card termostato standard non mostra umidità né lo stato "in attesa". Una tile card sì:
+
+```yaml
+type: tile
+entity: climate.cucina_cucina
+state_content:
+  - hvac_action
+  - current_temperature
+  - current_humidity
+  - command_pending
+features:
+  - type: target-temperature
+```
+
 ## Limiti noti
+- Se `activeProgram` coincide sempre con `scheduledProgram`, il modo `auto` potrebbe non essere distinguibile dai preset (da verificare su un impianto reale).
 - L'API non espone l'accensione/spegnimento di una stanza: da Home Assistant si può selezionare solo `auto`.
 - Inverno/estate è un'impostazione del gateway e per ora è in sola lettura.
 
@@ -34,6 +52,8 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
 
 ## TODO
 - [ ] Verificare la scrittura di setpoint e preset su un impianto reale.
+- [ ] Entità `number` per modificare le temperature comfort/eco/standby (`PUT .../setpoints`).
+- [ ] Nome entità duplicato (`climate.cucina_cucina`).
 - [ ] Cambio winter/summer e working mode (`PUT .../system/workingmode`).
 - [ ] Sensore temperatura esterna, batteria accessori, finestre aperte.
 
