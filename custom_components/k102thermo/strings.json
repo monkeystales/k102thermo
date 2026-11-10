@@ -16,6 +16,19 @@
       "cannot_connect": "Impossibile connettersi",
       "invalid_auth": "Credenziali non valide"
     },
-    "abort": { "already_configured": "Account già configurato" }
+    "abort": {
+      "already_configured": "Account già configurato"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "K102 Thermo",
+        "description": "Ogni quanti secondi interrogare il cloud Klima102 (30–3600). Dopo un comando l'integrazione aggiorna comunque ogni 5 s per un massimo di 90 s.",
+        "data": {
+          "scan_interval": "Intervallo di aggiornamento"
+        }
+      }
+    }
   }
 }

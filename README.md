@@ -19,7 +19,13 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
   - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
   - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
 - Sensori temperatura e umidità per stanza.
-- Polling ogni 60 s di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`.
+- Polling di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`, ogni 60 s di default (configurabile, vedi sotto).
+
+## Configurazione
+**Intervallo di aggiornamento**: Impostazioni → Dispositivi e servizi → K102 Thermo → *Configura*.
+Valori ammessi 30–3600 secondi (default 60). Al salvataggio l'integrazione si ricarica da sola.
+Dopo un comando l'integrazione aggiorna comunque ogni 5 s per un massimo di 90 s, finché il cloud non conferma il nuovo stato; è questo che imposta `command_pending`.
+Ogni aggiornamento fa 1 richiesta per la lista dei gateway più 1 per ogni gateway.
 
 ## Esempio di card
 La card termostato standard non mostra umidità né lo stato "in attesa". Una tile card sì:
@@ -43,6 +49,7 @@ features:
 - Inverno/estate è un'impostazione del gateway e per ora è in sola lettura.
 
 ## API
+- Intervallo, soglie e timeout sono nelle costanti di `const.py` e `climate.py`.
 - Token: `POST https://home.klima102.com/uaa2/oauth/token` (OAuth2 *password grant*; `client_id` e `client_secret` come parametri di query, `username`/`password` nel body).
 - Dati: `https://home.klima102.com/thermo-server/v1/...` con `Authorization: Bearer`.
 - Temperature in **decimi di °C**.

@@ -16,6 +16,19 @@
       "cannot_connect": "Unable to connect",
       "invalid_auth": "Invalid credentials"
     },
-    "abort": { "already_configured": "Account is already configured" }
+    "abort": {
+      "already_configured": "Account is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "K102 Thermo",
+        "description": "How many seconds between polls of the Klima102 cloud (30–3600). After a command the integration still polls every 5 s for up to 90 s.",
+        "data": {
+          "scan_interval": "Update interval"
+        }
+      }
+    }
   }
 }
