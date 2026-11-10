@@ -1,0 +1,12 @@
+{
+  "domain": "k102thermo",
+  "name": "K102 Thermo (Klima102)",
+  "codeowners": ["@monkeystales"],
+  "config_flow": true,
+  "documentation": "https://github.com/monkeystales/k102thermo",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/monkeystales/k102thermo/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

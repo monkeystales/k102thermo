@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Klima102",
+        "description": "Account Klima102 e credenziali OAuth client dell'app.",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "client_id": "Client ID",
+          "client_secret": "Client secret"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi",
+      "invalid_auth": "Credenziali non valide"
+    },
+    "abort": { "already_configured": "Account già configurato" }
+  }
+}
