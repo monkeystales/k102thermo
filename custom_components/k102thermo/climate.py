@@ -56,11 +56,13 @@ class K102Climate(K102RoomEntity, ClimateEntity):
     _attr_preset_modes = PRESETS
     _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL, HVACMode.AUTO]
 
+    # Defined at class level: the base __init__ reads `self.room` before ours runs.
+    _pending: dict[str, Any] | None = None
+    _unsub_poll: CALLBACK_TYPE | None = None
+
     def __init__(self, coordinator: K102Coordinator, mac: str, room_id: str) -> None:
         super().__init__(coordinator, mac, room_id)
         self._attr_unique_id = f"{mac}_{room_id}_climate"
-        self._pending: dict[str, Any] | None = None
-        self._unsub_poll: CALLBACK_TYPE | None = None
 
     # --- room data, with the optimistic override applied -------------------
 
