@@ -48,7 +48,7 @@ class K102Climate(K102RoomEntity, ClimateEntity):
     """A room thermostat."""
 
     _attr_name = None
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_target_temperature_step = 0.1
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
@@ -77,7 +77,7 @@ class K102Climate(K102RoomEntity, ClimateEntity):
         return {**base, **override}
 
     @property
-    def current_temperature(self) -> float | None:
+    def native_current_temperature(self) -> float | None:
         r = self.room
         if r and r.get("temperature") is not None:
             return r["temperature"] / 10
@@ -112,7 +112,7 @@ class K102Climate(K102RoomEntity, ClimateEntity):
         return prog if prog in PRESETS else None
 
     @property
-    def target_temperature(self) -> float | None:
+    def native_target_temperature(self) -> float | None:
         r = self.room or {}
         temps = r.get("temperatures") or {}
         prog = r.get("activeProgram")
