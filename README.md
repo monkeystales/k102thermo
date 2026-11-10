@@ -37,6 +37,7 @@ features:
 ```
 
 ## Limiti noti
+- Gli ID entità possono risultare doppi (es. `climate.cucina_cucina`): Home Assistant antepone al nome del dispositivo anche il nome dell'area, e le stanze hanno area e dispositivo con lo stesso nome. Non dipende dall'integrazione: rinomina l'ID dell'entità o l'area.
 - Se `activeProgram` coincide sempre con `scheduledProgram`, il modo `auto` potrebbe non essere distinguibile dai preset (da verificare su un impianto reale).
 - L'API non espone l'accensione/spegnimento di una stanza: da Home Assistant si può selezionare solo `auto`.
 - Inverno/estate è un'impostazione del gateway e per ora è in sola lettura.
@@ -53,7 +54,6 @@ features:
 ## TODO
 - [ ] Verificare la scrittura di setpoint e preset su un impianto reale.
 - [ ] Entità `number` per modificare le temperature comfort/eco/standby (`PUT .../setpoints`).
-- [ ] Nome entità duplicato (`climate.cucina_cucina`).
 - [ ] Cambio winter/summer e working mode (`PUT .../system/workingmode`).
 - [ ] Sensore temperatura esterna, batteria accessori, finestre aperte.
 
