@@ -14,7 +14,7 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
 - Config flow: username, password e credenziali OAuth client dell'app (`client_id` / `client_secret`).
 - Una `climate` per stanza:
   - temperatura e umidità correnti, setpoint del programma attivo;
-  - menu preset con la sola voce **Auto** (e modo HVAC `auto`): riporta la stanza alla programmazione del dispositivo, annullando manuali e forzature;
+  - preset `comfort` / `eco` / `standby` / `timed_manual` / `manual` / `auto`; il modo `auto` (preset e modo HVAC) riporta la stanza alla programmazione del dispositivo, annullando i manuali e i preset forzati;
   - `heat` o `cool` in base al modo inverno/estate del gateway, `off` se la stanza è disabilitata.
   - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
   - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
@@ -51,6 +51,7 @@ data:
 ```
 
 - Le temperature manuali vanno a passi di 0,5 °C (anche i valori passati al servizio vengono arrotondati a 0,5).
+- Scegliendo il preset `timed_manual` o `manual` dal menu si riusa l'ultima temperatura manuale della stanza.
 - L'attributo `manual_type` (`timed` / `persistent`) indica il tipo attivo.
 - Da verificare su impianto reale: che l'API accetti `timedManual` con `manualTemperature` e come riporti la fine della fascia.
 

@@ -24,10 +24,17 @@ from .api import K102Error
 from .coordinator import K102ConfigEntry, K102Coordinator
 from .entity import K102RoomEntity
 
-# The preset menu only offers "auto": back to the device's own schedule.
-# Manual temperatures are set with +/-, the manual-type select or the service.
-PRESET_AUTO = "auto"
-PRESETS = [PRESET_AUTO]
+# HA preset -> API activeProgram
+PRESET_TO_PROGRAM = {
+    "comfort": "comfort",
+    "eco": "eco",
+    "standby": "standby",
+    "timed_manual": "timedManual",  # manual until the next schedule change
+    "manual": "manual",  # persistent manual
+    "auto": "auto",  # back to the device's own schedule
+}
+PROGRAM_TO_PRESET = {v: k for k, v in PRESET_TO_PROGRAM.items()}
+PRESETS = list(PRESET_TO_PROGRAM)
 
 
 def _is_auto(room: dict[str, Any]) -> bool:
@@ -144,7 +151,10 @@ class K102Climate(K102RoomEntity, ClimateEntity):
 
     @property
     def preset_mode(self) -> str | None:
-        return PRESET_AUTO if _is_auto(self.room or {}) else None
+        r = self.room or {}
+        if _is_auto(r):
+            return "auto"
+        return PROGRAM_TO_PRESET.get(r.get("activeProgram"))
 
     @property
     def native_target_temperature(self) -> float | None:
@@ -195,7 +205,16 @@ class K102Climate(K102RoomEntity, ClimateEntity):
         )
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
-        await self._async_command("auto")
+        program = PRESET_TO_PROGRAM[preset_mode]
+        temperature = None
+        if program in MANUAL_PROGRAMS:
+            # Reuse the room's last manual temperature.
+            temperature = (super().room or {}).get("manualTemperature")
+            if temperature is None:
+                raise ServiceValidationError(
+                    "No manual temperature known for this room: set a temperature first"
+                )
+        await self._async_command(program, temperature)
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         # Winter/summer is gateway-wide and the API has no room on/off call:
