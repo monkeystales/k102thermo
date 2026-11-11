@@ -110,6 +110,7 @@ class K102AccessoryEntity(CoordinatorEntity[K102Coordinator]):
             name=f"{place_name} {label}".strip() if place_name else label,
             manufacturer="Klima102",
             model=acc.get("type"),
+            serial_number=acc_id,
         )
 
     @property
