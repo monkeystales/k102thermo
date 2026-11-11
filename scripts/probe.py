@@ -60,29 +60,34 @@ async def main() -> None:
         await c.async_login()
         print("LOGIN OK")
         gws = await c.async_get_gateways()
-        print("GATEWAYS:", json.dumps(mask(gws), indent=1))
+        events_only = len(sys.argv) > 1 and sys.argv[1] == "events"
+        if not events_only:
+            print("GATEWAYS:", json.dumps(mask(gws), indent=1))
         for gw in gws or []:
-            rooms = await c.async_get_rooms(gw["macAddress"])
-            print("ROOMS:", json.dumps(mask(rooms), indent=1))
+            mac = gw["macAddress"]
             structure = None
-            for label, call in (
-                ("STRUCTURE", c.async_get_structure),
-                ("DEVICES", c.async_get_devices),
-                ("SYSTEM", c.async_get_system),
-                ("CHART", c.async_get_chart),
-            ):
-                try:
-                    data = await call(gw["macAddress"])
-                    if label == "STRUCTURE":
-                        structure = data
-                    print(f"{label}:", json.dumps(mask(data), indent=1)[:6000])
-                except Exception as err:  # noqa: BLE001
-                    print(f"{label}: ERROR {err}")
+            if not events_only:
+                rooms = await c.async_get_rooms(mac)
+                print("ROOMS:", json.dumps(mask(rooms), indent=1))
+                for label, call in (
+                    ("STRUCTURE", c.async_get_structure),
+                    ("DEVICES", c.async_get_devices),
+                    ("SYSTEM", c.async_get_system),
+                ):
+                    try:
+                        data = await call(mac)
+                        if label == "STRUCTURE":
+                            structure = data
+                        print(f"{label}:", json.dumps(mask(data), indent=1))
+                    except Exception as err:  # noqa: BLE001
+                        print(f"{label}: ERROR {err}")
+            else:
+                structure = await c.async_get_structure(mac)
             hub_id = (structure or {}).get("hubId") or gw.get("accessoryHubId")
             if hub_id:
                 try:
-                    events = await c.async_get_event_log(hub_id)
-                    print("EVENT-LOG:", json.dumps(mask(events), indent=1)[:6000])
+                    events = await c.async_get_event_log(hub_id, 30)
+                    print("EVENT-LOG:", json.dumps(mask(events), indent=1)[:8000])
                 except Exception as err:  # noqa: BLE001
                     print(f"EVENT-LOG: ERROR {err}")
 
