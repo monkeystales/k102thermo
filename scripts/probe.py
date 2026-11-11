@@ -83,13 +83,26 @@ async def main() -> None:
                         print(f"{label}: ERROR {err}")
             else:
                 structure = await c.async_get_structure(mac)
-            hub_id = (structure or {}).get("hubId") or gw.get("accessoryHubId")
-            if hub_id:
+            candidates = [
+                ("structure.hubId", (structure or {}).get("hubId")),
+                ("gateway.accessoryHubId", gw.get("accessoryHubId")),
+                ("structure.id", (structure or {}).get("id")),
+                ("gateway.macAddress", gw.get("macAddress")),
+                ("gateway.serialNumber", gw.get("serialNumber")),
+                ("gateway.id", gw.get("id")),
+            ]
+            print("HUB ID CANDIDATES present:", [n for n, v in candidates if v])
+            for name, value in candidates:
+                if not value:
+                    continue
                 try:
-                    events = await c.async_get_event_log(hub_id, 30)
-                    print("EVENT-LOG:", json.dumps(mask(events), indent=1)[:8000])
+                    events = await c.async_get_event_log(str(value), 30)
                 except Exception as err:  # noqa: BLE001
-                    print(f"EVENT-LOG: ERROR {err}")
+                    print(f"EVENT-LOG with {name}: ERROR {err}")
+                    continue
+                print(f"EVENT-LOG with {name}:", json.dumps(mask(events), indent=1)[:8000])
+                if events:
+                    break
 
 
 asyncio.run(main())
