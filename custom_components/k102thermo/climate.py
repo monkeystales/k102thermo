@@ -31,9 +31,18 @@ PRESET_TO_PROGRAM = {
     "standby": "standby",
     "timed_manual": "timedManual",  # manual until the next schedule change
     "manual": "manual",  # persistent manual
+    "auto": "auto",  # back to the device's own schedule
 }
 PROGRAM_TO_PRESET = {v: k for k, v in PRESET_TO_PROGRAM.items()}
 PRESETS = list(PRESET_TO_PROGRAM)
+
+
+def _is_auto(room: dict[str, Any]) -> bool:
+    """True when the room follows the device schedule (no override active)."""
+    prog = room.get("activeProgram")
+    if prog == "auto":
+        return True
+    return prog is not None and prog not in MANUAL_PROGRAMS and prog == room.get("scheduledProgram")
 
 
 def _to_tenths(temp: float) -> int:
@@ -127,7 +136,7 @@ class K102Climate(K102RoomEntity, ClimateEntity):
         r = self.room or {}
         if r.get("enabled") is False:
             return HVACMode.OFF
-        if r.get("activeProgram") == "auto":
+        if _is_auto(r):
             return HVACMode.AUTO
         return HVACMode.COOL if r.get("opMode") == "summer" else HVACMode.HEAT
 
@@ -142,13 +151,18 @@ class K102Climate(K102RoomEntity, ClimateEntity):
 
     @property
     def preset_mode(self) -> str | None:
-        return PROGRAM_TO_PRESET.get((self.room or {}).get("activeProgram"))
+        r = self.room or {}
+        if _is_auto(r):
+            return "auto"
+        return PROGRAM_TO_PRESET.get(r.get("activeProgram"))
 
     @property
     def native_target_temperature(self) -> float | None:
         r = self.room or {}
         temps = r.get("temperatures") or {}
         prog = r.get("activeProgram")
+        if prog == "auto":
+            prog = r.get("scheduledProgram")
         if prog in temps:
             return temps[prog] / 10
         if r.get("manualTemperature") is not None:
@@ -164,6 +178,8 @@ class K102Climate(K102RoomEntity, ClimateEntity):
         for key in ("comfort", "eco", "standby"):
             if temps.get(key) is not None:
                 attrs[f"{key}_temperature"] = temps[key] / 10
+        if room.get("scheduledProgram"):
+            attrs["scheduled_program"] = room["scheduledProgram"]
         program = room.get("activeProgram")
         if program == "timedManual":
             attrs["manual_type"] = "timed"

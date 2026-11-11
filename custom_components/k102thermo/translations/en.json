@@ -50,7 +50,8 @@
               "eco": "Eco",
               "standby": "Standby",
               "timed_manual": "Timed manual",
-              "manual": "Persistent manual"
+              "manual": "Persistent manual",
+              "auto": "Auto (device schedule)"
             }
           }
         }

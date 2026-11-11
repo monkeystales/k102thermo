@@ -14,7 +14,7 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
 - Config flow: username, password e credenziali OAuth client dell'app (`client_id` / `client_secret`).
 - Una `climate` per stanza:
   - temperatura e umidità correnti, setpoint del programma attivo;
-  - preset `comfort` / `eco` / `standby` / `timed_manual` / `manual`, e modo `auto` (segue la programmazione);
+  - preset `comfort` / `eco` / `standby` / `timed_manual` / `manual` / `auto`; il modo `auto` (preset e modo HVAC) riporta la stanza alla programmazione del dispositivo, annullando i manuali e i preset forzati;
   - `heat` o `cool` in base al modo inverno/estate del gateway, `off` se la stanza è disabilitata.
   - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
   - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
@@ -64,7 +64,7 @@ features:
 
 ## Limiti noti
 - Gli ID entità possono risultare doppi (es. `climate.cucina_cucina`): Home Assistant antepone al nome del dispositivo anche il nome dell'area, e le stanze hanno area e dispositivo con lo stesso nome. Non dipende dall'integrazione: rinomina l'ID dell'entità o l'area.
-- Se `activeProgram` coincide sempre con `scheduledProgram`, il modo `auto` potrebbe non essere distinguibile dai preset (da verificare su un impianto reale).
+- `auto` viene riconosciuto quando l'API riporta `activeProgram: auto` oppure quando `activeProgram` coincide con `scheduledProgram` (nessun override attivo). Se forzi un preset uguale a quello in programma, Home Assistant lo mostra quindi come `auto`. L'attributo `scheduled_program` indica il programma previsto dal dispositivo. Da verificare su un impianto reale.
 - L'API non espone l'accensione/spegnimento di una stanza: da Home Assistant si può selezionare solo `auto`.
 - Inverno/estate è un'impostazione del gateway e per ora è in sola lettura.
 
