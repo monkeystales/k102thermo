@@ -60,12 +60,7 @@
         "state_attributes": {
           "preset_mode": {
             "state": {
-              "comfort": "Comfort",
-              "eco": "Eco",
-              "standby": "Standby",
-              "timed_manual": "Timed manual",
-              "manual": "Persistent manual",
-              "auto": "Auto (device schedule)"
+              "auto": "Auto"
             }
           }
         }
