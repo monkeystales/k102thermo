@@ -4,9 +4,9 @@
 
 # K102 Thermo – integrazione Home Assistant (Klima102)
 
-Integrazione non ufficiale, non affiliata a Klima102 / Giacomini. Il logo appartiene ai rispettivi proprietari.
+Integrazione non ufficiale, non affiliata a Klima102. Il logo appartiene ai rispettivi proprietari.
 
-Integrazione custom (cloud polling) per i termostati Klima102 / Giacomini, basata sulla
+Integrazione custom (cloud polling) per i termostati Klima102, basata sulla
 [Klima102 Services API](https://home.klima102.com/thermo-server/swagger-ui.html).
 Login e lettura di gateway e stanze sono stati verificati su un impianto reale; la scrittura dei setpoint non è ancora stata provata.
 
