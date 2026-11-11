@@ -51,10 +51,18 @@ class K102RoomEntity(CoordinatorEntity[K102Coordinator]):
 
 
 ACCESSORY_LABELS = {
-    "ThermostaticValve": "Valvola",
-    "SensTU": "Sensore",
-    "Switch1": "Attuatore caldaia",
-    "SmartPlug": "Presa smart",
+    "it": {
+        "ThermostaticValve": "Valvola",
+        "SensTU": "Sensore",
+        "Switch1": "Attuatore caldaia",
+        "SmartPlug": "Presa smart",
+    },
+    "en": {
+        "ThermostaticValve": "Valve",
+        "SensTU": "Sensor",
+        "Switch1": "Boiler actuator",
+        "SmartPlug": "Smart plug",
+    },
 }
 
 
@@ -90,7 +98,13 @@ class K102AccessoryEntity(CoordinatorEntity[K102Coordinator]):
             if place
             else ((gw or {}).get("gateway") or {}).get("name")
         )
-        label = ACCESSORY_LABELS.get(acc.get("type"), acc.get("type", "Accessorio"))
+        lang = "it" if coordinator.hass.config.language.startswith("it") else "en"
+        acc_type = acc.get("type", "")
+        label = ACCESSORY_LABELS[lang].get(acc_type, acc_type or "Accessory")
+        # Entity names embed the device type, e.g. "Batteria valvola" / "Valve battery".
+        self._attr_translation_placeholders = {
+            "device_type": label.lower() if lang == "it" else label
+        }
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{mac}_acc_{acc_id}")},
             name=f"{place_name} {label}".strip() if place_name else label,

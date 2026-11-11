@@ -19,7 +19,7 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
   - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
   - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
 - Sensori temperatura e umidità per stanza.
-- **Accessori** (valvole termostatiche, sensori, centralina, presa smart): un dispositivo per ciascuno, con
+- **Accessori** (valvole termostatiche, sensori, centralina, presa smart): un dispositivo per ciascuno. I nomi delle entità riportano il tipo (es. *Batteria valvola*, *Temperatura sensore*), nella lingua di Home Assistant. Ogni dispositivo ha
   - sensore **batteria** (solo per quelli a batteria) e **temperatura** misurata dall'accessorio;
   - sensore binario **connettività**;
   - sensore **ultimo contatto** (disattivato di default, abilitalo dalle entità).

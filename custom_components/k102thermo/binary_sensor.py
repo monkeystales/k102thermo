@@ -41,6 +41,7 @@ class K102ConnectivitySensor(K102AccessoryEntity, BinarySensorEntity):
 
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_translation_key = "accessory_connectivity"
 
     def __init__(self, coordinator: K102Coordinator, mac: str, acc_id: str) -> None:
         super().__init__(coordinator, mac, acc_id)

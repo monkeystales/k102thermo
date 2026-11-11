@@ -115,6 +115,7 @@ def _last_seen(acc: dict[str, Any]) -> datetime | None:
 
 ACCESSORY_BATTERY = K102AccessorySensorDescription(
     key="battery",
+    translation_key="accessory_battery",
     device_class=SensorDeviceClass.BATTERY,
     native_unit_of_measurement=PERCENTAGE,
     state_class=SensorStateClass.MEASUREMENT,
@@ -123,6 +124,7 @@ ACCESSORY_BATTERY = K102AccessorySensorDescription(
 )
 ACCESSORY_TEMPERATURE = K102AccessorySensorDescription(
     key="temperature",
+    translation_key="accessory_temperature",
     device_class=SensorDeviceClass.TEMPERATURE,
     native_unit_of_measurement=UnitOfTemperature.CELSIUS,
     state_class=SensorStateClass.MEASUREMENT,
@@ -130,7 +132,7 @@ ACCESSORY_TEMPERATURE = K102AccessorySensorDescription(
 )
 ACCESSORY_LAST_SEEN = K102AccessorySensorDescription(
     key="last_seen",
-    translation_key="last_seen",
+    translation_key="accessory_last_seen",
     device_class=SensorDeviceClass.TIMESTAMP,
     entity_category=EntityCategory.DIAGNOSTIC,
     entity_registry_enabled_default=False,

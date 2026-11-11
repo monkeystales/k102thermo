@@ -72,8 +72,14 @@
       }
     },
     "sensor": {
-      "last_seen": {
-        "name": "Ultimo contatto"
+      "accessory_battery": {
+        "name": "Batteria {device_type}"
+      },
+      "accessory_temperature": {
+        "name": "Temperatura {device_type}"
+      },
+      "accessory_last_seen": {
+        "name": "Ultimo contatto {device_type}"
       }
     },
     "binary_sensor": {
@@ -82,6 +88,9 @@
       },
       "boiler_demand": {
         "name": "Richiesta caldaia"
+      },
+      "accessory_connectivity": {
+        "name": "Connettività {device_type}"
       }
     }
   },

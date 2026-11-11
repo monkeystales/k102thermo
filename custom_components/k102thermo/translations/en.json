@@ -72,8 +72,14 @@
       }
     },
     "sensor": {
-      "last_seen": {
-        "name": "Last seen"
+      "accessory_battery": {
+        "name": "{device_type} battery"
+      },
+      "accessory_temperature": {
+        "name": "{device_type} temperature"
+      },
+      "accessory_last_seen": {
+        "name": "{device_type} last seen"
       }
     },
     "binary_sensor": {
@@ -82,6 +88,9 @@
       },
       "boiler_demand": {
         "name": "Boiler demand"
+      },
+      "accessory_connectivity": {
+        "name": "{device_type} connectivity"
       }
     }
   },
