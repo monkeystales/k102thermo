@@ -34,9 +34,16 @@ PRESET_TO_PROGRAM = {
 }
 PROGRAM_TO_PRESET = {v: k for k, v in PRESET_TO_PROGRAM.items()}
 PRESETS = list(PRESET_TO_PROGRAM)
+
+
+def _to_tenths(temp: float) -> int:
+    """Round to the nearest 0.5 °C and convert to tenths of a degree."""
+    return round(temp * 2) * 5
+
 MANUAL_PROGRAMS = ("timedManual", "manual")
 
 SERVICE_SET_MANUAL = "set_manual"
+MANUAL_STEP = 0.5
 MIN_MANUAL_TEMP = 5.0
 MAX_MANUAL_TEMP = 35.0
 
@@ -76,7 +83,7 @@ class K102Climate(K102RoomEntity, ClimateEntity):
     _attr_name = None
     _attr_translation_key = "room"
     _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
-    _attr_target_temperature_step = 0.1
+    _attr_target_temperature_step = 0.5
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
     )
@@ -173,12 +180,12 @@ class K102Climate(K102RoomEntity, ClimateEntity):
         persistent = (
             self.coordinator.manual_types.get((self._mac, self._room_id)) == "persistent"
         )
-        await self._async_command("manual" if persistent else "timedManual", round(temp * 10))
+        await self._async_command("manual" if persistent else "timedManual", _to_tenths(temp))
 
     async def async_set_manual(self, temperature: float, persistent: bool = False) -> None:
         """Service k102thermo.set_manual."""
         await self._async_command(
-            "manual" if persistent else "timedManual", round(temperature * 10)
+            "manual" if persistent else "timedManual", _to_tenths(temperature)
         )
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:

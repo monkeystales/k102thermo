@@ -36,6 +36,7 @@ data:
   persistent: true
 ```
 
+- Le temperature manuali vanno a passi di 0,5 °C (anche i valori passati al servizio vengono arrotondati a 0,5).
 - Scegliendo il preset `timed_manual` o `manual` dal menu si riusa l'ultima temperatura manuale della stanza.
 - L'attributo `manual_type` (`timed` / `persistent`) indica il tipo attivo.
 - Da verificare su impianto reale: che l'API accetti `timedManual` con `manualTemperature` e come riporti la fine della fascia.

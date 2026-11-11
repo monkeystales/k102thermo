@@ -10,7 +10,7 @@ set_manual:
         number:
           min: 5
           max: 35
-          step: 0.1
+          step: 0.5
           unit_of_measurement: "°C"
     persistent:
       required: false
