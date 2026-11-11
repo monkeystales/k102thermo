@@ -15,14 +15,30 @@ from homeassistant.components.climate import (
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.event import async_call_later
+import voluptuous as vol
 
 from .api import K102Error
 from .coordinator import K102ConfigEntry, K102Coordinator
 from .entity import K102RoomEntity
 
-PRESETS = ["comfort", "eco", "standby"]
+# HA preset -> API activeProgram
+PRESET_TO_PROGRAM = {
+    "comfort": "comfort",
+    "eco": "eco",
+    "standby": "standby",
+    "timed_manual": "timedManual",  # manual until the next schedule change
+    "manual": "manual",  # persistent manual
+}
+PROGRAM_TO_PRESET = {v: k for k, v in PRESET_TO_PROGRAM.items()}
+PRESETS = list(PRESET_TO_PROGRAM)
+MANUAL_PROGRAMS = ("timedManual", "manual")
+
+SERVICE_SET_MANUAL = "set_manual"
+MIN_MANUAL_TEMP = 5.0
+MAX_MANUAL_TEMP = 35.0
 
 # The cloud applies commands slowly: until the room reports the new state we
 # show the requested one (optimistic) and poll faster, up to this timeout.
@@ -42,12 +58,23 @@ async def async_setup_entry(
         for mac, info in coordinator.data.items()
         for room in info["status"].get("rooms", [])
     )
+    entity_platform.async_get_current_platform().async_register_entity_service(
+        SERVICE_SET_MANUAL,
+        {
+            vol.Required(ATTR_TEMPERATURE): vol.All(
+                vol.Coerce(float), vol.Range(min=MIN_MANUAL_TEMP, max=MAX_MANUAL_TEMP)
+            ),
+            vol.Optional("persistent", default=False): cv.boolean,
+        },
+        "async_set_manual",
+    )
 
 
 class K102Climate(K102RoomEntity, ClimateEntity):
     """A room thermostat."""
 
     _attr_name = None
+    _attr_translation_key = "room"
     _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_target_temperature_step = 0.1
     _attr_supported_features = (
@@ -108,8 +135,7 @@ class K102Climate(K102RoomEntity, ClimateEntity):
 
     @property
     def preset_mode(self) -> str | None:
-        prog = (self.room or {}).get("activeProgram")
-        return prog if prog in PRESETS else None
+        return PROGRAM_TO_PRESET.get((self.room or {}).get("activeProgram"))
 
     @property
     def native_target_temperature(self) -> float | None:
@@ -125,11 +151,17 @@ class K102Climate(K102RoomEntity, ClimateEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Program setpoints and pending-command flag (shown in the entity dialog)."""
-        temps = (self.room or {}).get("temperatures") or {}
+        room = self.room or {}
+        temps = room.get("temperatures") or {}
         attrs: dict[str, Any] = {"command_pending": self._pending is not None}
-        for key in PRESETS:
+        for key in ("comfort", "eco", "standby"):
             if temps.get(key) is not None:
                 attrs[f"{key}_temperature"] = temps[key] / 10
+        program = room.get("activeProgram")
+        if program == "timedManual":
+            attrs["manual_type"] = "timed"
+        elif program == "manual":
+            attrs["manual_type"] = "persistent"
         return attrs
 
     # --- commands ------------------------------------------------------------
@@ -137,10 +169,29 @@ class K102Climate(K102RoomEntity, ClimateEntity):
     async def async_set_temperature(self, **kwargs: Any) -> None:
         if (temp := kwargs.get(ATTR_TEMPERATURE)) is None:
             return
-        await self._async_command("manual", round(temp * 10))
+        # Timed manual by default; persistent only if the room's select says so.
+        persistent = (
+            self.coordinator.manual_types.get((self._mac, self._room_id)) == "persistent"
+        )
+        await self._async_command("manual" if persistent else "timedManual", round(temp * 10))
+
+    async def async_set_manual(self, temperature: float, persistent: bool = False) -> None:
+        """Service k102thermo.set_manual."""
+        await self._async_command(
+            "manual" if persistent else "timedManual", round(temperature * 10)
+        )
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
-        await self._async_command(preset_mode)
+        program = PRESET_TO_PROGRAM[preset_mode]
+        temperature = None
+        if program in MANUAL_PROGRAMS:
+            # Reuse the room's last manual temperature.
+            temperature = (super().room or {}).get("manualTemperature")
+            if temperature is None:
+                raise ServiceValidationError(
+                    "No manual temperature known for this room: set a temperature first"
+                )
+        await self._async_command(program, temperature)
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         # Winter/summer is gateway-wide and the API has no room on/off call:

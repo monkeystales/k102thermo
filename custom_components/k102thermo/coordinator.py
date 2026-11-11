@@ -37,6 +37,8 @@ class K102Coordinator(DataUpdateCoordinator[dict[str, dict[str, Any]]]):
             ),
         )
         self.client = client
+        # Per-room manual type chosen with the select entity: "timed" | "persistent".
+        self.manual_types: dict[tuple[str, str], str] = {}
 
     async def _async_update_data(self) -> dict[str, dict[str, Any]]:
         try:

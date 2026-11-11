@@ -30,5 +30,47 @@
         }
       }
     }
+  },
+  "entity": {
+    "select": {
+      "manual_type": {
+        "name": "Manual type",
+        "state": {
+          "timed": "Timed (until next schedule change)",
+          "persistent": "Persistent"
+        }
+      }
+    },
+    "climate": {
+      "room": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "comfort": "Comfort",
+              "eco": "Eco",
+              "standby": "Standby",
+              "timed_manual": "Timed manual",
+              "manual": "Persistent manual"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "set_manual": {
+      "name": "Set manual",
+      "description": "Set a manual temperature: timed (until the next schedule change) or persistent.",
+      "fields": {
+        "temperature": {
+          "name": "Temperature",
+          "description": "Target temperature in °C."
+        },
+        "persistent": {
+          "name": "Persistent",
+          "description": "If on, the manual stays until changed; otherwise it ends at the next schedule change."
+        }
+      }
+    }
   }
 }

@@ -30,5 +30,47 @@
         }
       }
     }
+  },
+  "entity": {
+    "select": {
+      "manual_type": {
+        "name": "Tipo di manuale",
+        "state": {
+          "timed": "Temporizzato (fino alla prossima fascia)",
+          "persistent": "Persistente"
+        }
+      }
+    },
+    "climate": {
+      "room": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "comfort": "Comfort",
+              "eco": "Eco",
+              "standby": "Standby",
+              "timed_manual": "Manuale temporizzato",
+              "manual": "Manuale persistente"
+            }
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "set_manual": {
+      "name": "Imposta manuale",
+      "description": "Imposta una temperatura manuale: temporizzata (fino alla prossima fascia) o persistente.",
+      "fields": {
+        "temperature": {
+          "name": "Temperatura",
+          "description": "Temperatura target in °C."
+        },
+        "persistent": {
+          "name": "Persistente",
+          "description": "Se attivo il manuale resta fino a nuovo cambio; altrimenti termina alla prossima fascia."
+        }
+      }
+    }
   }
 }

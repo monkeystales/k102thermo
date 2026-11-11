@@ -10,7 +10,7 @@ from .api import K102Client
 from .const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from .coordinator import K102ConfigEntry, K102Coordinator
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CLIMATE]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CLIMATE, Platform.SELECT]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: K102ConfigEntry) -> bool:

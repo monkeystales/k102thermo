@@ -14,12 +14,31 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
 - Config flow: username, password e credenziali OAuth client dell'app (`client_id` / `client_secret`).
 - Una `climate` per stanza:
   - temperatura e umidità correnti, setpoint del programma attivo;
-  - preset `comfort` / `eco` / `standby`, e modo `auto` (segue la programmazione);
+  - preset `comfort` / `eco` / `standby` / `timed_manual` / `manual`, e modo `auto` (segue la programmazione);
   - `heat` o `cool` in base al modo inverno/estate del gateway, `off` se la stanza è disabilitata.
   - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
   - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
 - Sensori temperatura e umidità per stanza.
 - Polling di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`, ogni 60 s di default (configurabile, vedi sotto).
+
+## Manuale: temporizzato o persistente
+- **Manuale temporizzato** (`timedManual`): resta fino al prossimo cambio di fascia. È il default: ogni cambio di temperatura da Home Assistant (pulsanti − e +, `climate.set_temperature`) crea un manuale temporizzato.
+- **Manuale persistente** (`manual`): resta finché non lo cambi.
+- Per ogni stanza c'è un'entità **select "Tipo di manuale"** (Temporizzato / Persistente, il valore viene ricordato). Se la imposti su *Persistente*, i cambi di temperatura dalla card creano un manuale persistente.
+- Servizio `k102thermo.set_manual` (temperatura 5–35 °C, `persistent: true|false`) per impostare un manuale preciso da automazioni e script:
+
+```yaml
+action: k102thermo.set_manual
+target:
+  entity_id: climate.cucina
+data:
+  temperature: 21.5
+  persistent: true
+```
+
+- Scegliendo il preset `timed_manual` o `manual` dal menu si riusa l'ultima temperatura manuale della stanza.
+- L'attributo `manual_type` (`timed` / `persistent`) indica il tipo attivo.
+- Da verificare su impianto reale: che l'API accetti `timedManual` con `manualTemperature` e come riporti la fine della fascia.
 
 ## Configurazione
 **Intervallo di aggiornamento**: Impostazioni → Dispositivi e servizi → K102 Thermo → *Configura*.
