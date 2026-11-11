@@ -27,6 +27,12 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
   Gli accessori vengono riletti ogni 5 minuti (`GET /v1/housing-unit-structure/{mac}/full`), non a ogni polling. Se ne aggiungi uno nuovo sull'impianto, ricarica l'integrazione.
 - Polling di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`, ogni 60 s di default (configurabile, vedi sotto).
 
+## Modalità del sistema (per gateway)
+- **Modalità di lavoro** (`select`): *Normale* / *Vacanza (antigelo)*. Lettura e scrittura (`PUT /system/workingmode`).
+- **Stagione** (`select`): *Inverno* / *Estate*. Lettura affidabile; la **scrittura è sperimentale**: l'API non ha un endpoint dedicato e l'integrazione invia `{"opMode": ...}` all'aggiornamento dei setpoint di ogni stanza (`PUT /v2/gateways/{mac}/rooms/{roomId}/setpoints`). Da verificare sul proprio impianto; se non ha effetto, lo stato torna a quello reale dopo circa 90 s.
+- **Termoregolazione attiva** (`binary_sensor`): stato acceso/spento del sistema (`sysStatus`). **Sola lettura**: l'API documentata non permette di accendere o spegnere il sistema.
+- Come per i comandi sulle stanze, la scelta compare subito e il cloud viene interrogato ogni 5 s (max 90 s) finché non conferma.
+
 ## Manuale: temporizzato o persistente
 - **Manuale temporizzato** (`timedManual`): resta fino al prossimo cambio di fascia. È il default: ogni cambio di temperatura da Home Assistant (pulsanti − e +, `climate.set_temperature`) crea un manuale temporizzato.
 - **Manuale persistente** (`manual`): resta finché non lo cambi.

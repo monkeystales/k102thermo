@@ -55,6 +55,7 @@ class K102Coordinator(DataUpdateCoordinator[dict[str, dict[str, Any]]]):
                     "gateway": gw,
                     "status": await self.client.async_get_rooms(mac),
                     "structure": await self._async_get_structure(mac),
+                    "system": await self._async_get_system(mac),
                 }
             return data
         except K102AuthError as err:
@@ -76,3 +77,13 @@ class K102Coordinator(DataUpdateCoordinator[dict[str, dict[str, Any]]]):
             return cached[1] if cached else None
         self._structures[mac] = (time.monotonic(), structure)
         return structure
+
+    async def _async_get_system(self, mac: str) -> dict[str, Any] | None:
+        """System status (on/off); failures never break the main update."""
+        try:
+            return await self.client.async_get_system(mac)
+        except K102AuthError:
+            raise
+        except K102Error as err:
+            _LOGGER.debug("System status refresh failed: %s", err)
+            return None

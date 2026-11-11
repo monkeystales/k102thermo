@@ -108,3 +108,25 @@ class K102AccessoryEntity(CoordinatorEntity[K102Coordinator]):
     @property
     def available(self) -> bool:
         return super().available and self.accessory is not None
+
+
+class K102GatewayEntity(CoordinatorEntity[K102Coordinator]):
+    """Entity bound to a gateway (system-wide settings)."""
+
+    _attr_has_entity_name = True
+
+    def __init__(self, coordinator: K102Coordinator, mac: str) -> None:
+        super().__init__(coordinator)
+        self._mac = mac
+        gateway = coordinator.data[mac]["gateway"]
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, mac)},
+            name=gateway.get("name") or "Klima102",
+            manufacturer="Klima102",
+            model=gateway.get("systemType"),
+        )
+
+    @property
+    def available(self) -> bool:
+        gw = self.coordinator.data.get(self._mac)
+        return super().available and bool(gw and gw["status"].get("connected", True))

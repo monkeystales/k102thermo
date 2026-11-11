@@ -121,6 +121,25 @@ class K102Client:
         """Battery powered sensor accessories per room."""
         return await self._request("GET", f"/v1/gateways/{mac}/rooms/devices")
 
+    async def async_get_system(self, mac: str) -> dict[str, Any]:
+        """System properties: sysStatus, opMode, workingMode, externalTemperature."""
+        return await self._request("GET", f"/v1/gateways/{mac}/system")
+
+    async def async_set_working_mode(self, mac: str, mode: str) -> None:
+        """mode: normal | vacationNoFreeze."""
+        await self._request(
+            "PUT", f"/v1/gateways/{mac}/system/workingmode", json={"workingMode": mode}
+        )
+
+    async def async_set_op_mode(self, mac: str, room_ids: list[str], op_mode: str) -> None:
+        """Winter/summer. EXPERIMENTAL: the API only exposes opMode on room setpoints."""
+        for room_id in room_ids:
+            await self._request(
+                "PUT",
+                f"/v2/gateways/{mac}/rooms/{room_id}/setpoints",
+                json={"opMode": op_mode},
+            )
+
     async def async_set_program(
         self, mac: str, room_id: str, program: str, temperature: int | None = None
     ) -> None:

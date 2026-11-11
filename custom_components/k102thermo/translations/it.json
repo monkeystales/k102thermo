@@ -39,6 +39,20 @@
           "timed": "Temporizzato (fino alla prossima fascia)",
           "persistent": "Persistente"
         }
+      },
+      "working_mode": {
+        "name": "Modalità di lavoro",
+        "state": {
+          "normal": "Normale",
+          "vacation_no_freeze": "Vacanza (antigelo)"
+        }
+      },
+      "season": {
+        "name": "Stagione",
+        "state": {
+          "winter": "Inverno",
+          "summer": "Estate"
+        }
       }
     },
     "climate": {
@@ -60,6 +74,11 @@
     "sensor": {
       "last_seen": {
         "name": "Ultimo contatto"
+      }
+    },
+    "binary_sensor": {
+      "system_active": {
+        "name": "Termoregolazione attiva"
       }
     }
   },

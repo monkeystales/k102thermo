@@ -39,6 +39,20 @@
           "timed": "Timed (until next schedule change)",
           "persistent": "Persistent"
         }
+      },
+      "working_mode": {
+        "name": "Working mode",
+        "state": {
+          "normal": "Normal",
+          "vacation_no_freeze": "Vacation (no-freeze)"
+        }
+      },
+      "season": {
+        "name": "Season",
+        "state": {
+          "winter": "Winter",
+          "summer": "Summer"
+        }
       }
     },
     "climate": {
@@ -60,6 +74,11 @@
     "sensor": {
       "last_seen": {
         "name": "Last seen"
+      }
+    },
+    "binary_sensor": {
+      "system_active": {
+        "name": "Thermoregulation active"
       }
     }
   },
