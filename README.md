@@ -19,6 +19,12 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
   - attributi `comfort_temperature`, `eco_temperature`, `standby_temperature` (visibili nella finestra dell'entità);
   - attributo `command_pending`: `true` finché il cloud non conferma l'ultimo comando. Nel frattempo viene mostrato lo stato richiesto e il polling passa a 5 s (max 90 s).
 - Sensori temperatura e umidità per stanza.
+- **Accessori** (valvole termostatiche, sensori, centralina, presa smart): un dispositivo per ciascuno, con
+  - sensore **batteria** (solo per quelli a batteria) e **temperatura** misurata dall'accessorio;
+  - sensore binario **connettività**;
+  - sensore **ultimo contatto** (disattivato di default, abilitalo dalle entità).
+
+  Gli accessori vengono riletti ogni 5 minuti (`GET /v1/housing-unit-structure/{mac}/full`), non a ogni polling. Se ne aggiungi uno nuovo sull'impianto, ricarica l'integrazione.
 - Polling di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`, ogni 60 s di default (configurabile, vedi sotto).
 
 ## Manuale: temporizzato o persistente

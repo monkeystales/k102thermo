@@ -113,6 +113,14 @@ class K102Client:
     async def async_get_rooms(self, mac: str) -> dict[str, Any]:
         return await self._request("GET", f"/v1/gateways/{mac}/rooms")
 
+    async def async_get_structure(self, mac: str) -> dict[str, Any]:
+        """Full accessory list (valves, sensors) per room and control unit."""
+        return await self._request("GET", f"/v1/housing-unit-structure/{mac}/full")
+
+    async def async_get_devices(self, mac: str) -> list[dict[str, Any]]:
+        """Battery powered sensor accessories per room."""
+        return await self._request("GET", f"/v1/gateways/{mac}/rooms/devices")
+
     async def async_set_program(
         self, mac: str, room_id: str, program: str, temperature: int | None = None
     ) -> None:

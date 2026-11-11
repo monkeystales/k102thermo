@@ -38,7 +38,7 @@ def load(name: str):
 def mask(o):
     if isinstance(o, dict):
         return {
-            k: ("***" if k in {"macAddress", "id", "name", "serialNumber", "ownerPrincipal", "accessoryHubId"} else mask(v))
+            k: ("***" if k in {"macAddress", "id", "name", "serialNumber", "ownerPrincipal", "accessoryHubId", "hubId", "description", "deviceAddress"} else mask(v))
             for k, v in o.items()
         }
     if isinstance(o, list):
@@ -64,6 +64,15 @@ async def main() -> None:
         for gw in gws or []:
             rooms = await c.async_get_rooms(gw["macAddress"])
             print("ROOMS:", json.dumps(mask(rooms), indent=1))
+            for label, call in (
+                ("STRUCTURE", c.async_get_structure),
+                ("DEVICES", c.async_get_devices),
+            ):
+                try:
+                    data = await call(gw["macAddress"])
+                    print(f"{label}:", json.dumps(mask(data), indent=1))
+                except Exception as err:  # noqa: BLE001
+                    print(f"{label}: ERROR {err}")
 
 
 asyncio.run(main())
