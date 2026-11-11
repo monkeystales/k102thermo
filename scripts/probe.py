@@ -38,7 +38,7 @@ def load(name: str):
 def mask(o):
     if isinstance(o, dict):
         return {
-            k: ("***" if k in {"macAddress", "id", "name", "serialNumber", "ownerPrincipal", "accessoryHubId", "hubId", "description", "deviceAddress", "deviceUID", "eventId", "roomName"} else mask(v))
+            k: ("***" if k in {"macAddress", "id", "name", "serialNumber", "ownerPrincipal", "accessoryHubId", "hubId", "description", "deviceAddress"} else mask(v))
             for k, v in o.items()
         }
     if isinstance(o, list):
@@ -60,50 +60,21 @@ async def main() -> None:
         await c.async_login()
         print("LOGIN OK")
         gws = await c.async_get_gateways()
-        events_only = len(sys.argv) > 1 and sys.argv[1] == "events"
-        if not events_only:
-            print("GATEWAYS:", json.dumps(mask(gws), indent=1))
+        print("GATEWAYS:", json.dumps(mask(gws), indent=1))
         for gw in gws or []:
             mac = gw["macAddress"]
-            structure = None
-            if not events_only:
-                rooms = await c.async_get_rooms(mac)
-                print("ROOMS:", json.dumps(mask(rooms), indent=1))
-                for label, call in (
-                    ("STRUCTURE", c.async_get_structure),
-                    ("DEVICES", c.async_get_devices),
-                    ("SYSTEM", c.async_get_system),
-                ):
-                    try:
-                        data = await call(mac)
-                        if label == "STRUCTURE":
-                            structure = data
-                        print(f"{label}:", json.dumps(mask(data), indent=1))
-                    except Exception as err:  # noqa: BLE001
-                        print(f"{label}: ERROR {err}")
-            else:
-                structure = await c.async_get_structure(mac)
-            candidates = [
-                ("structure.hubId", (structure or {}).get("hubId")),
-                ("gateway.accessoryHubId", gw.get("accessoryHubId")),
-                ("structure.id", (structure or {}).get("id")),
-                ("gateway.macAddress", gw.get("macAddress")),
-                ("gateway.serialNumber", gw.get("serialNumber")),
-                ("gateway.id", gw.get("id")),
-            ]
-            print("HUB ID CANDIDATES present:", [n for n, v in candidates if v])
-            for name, value in candidates:
-                if not value:
-                    continue
+            rooms = await c.async_get_rooms(mac)
+            print("ROOMS:", json.dumps(mask(rooms), indent=1))
+            for label, call in (
+                ("STRUCTURE", c.async_get_structure),
+                ("DEVICES", c.async_get_devices),
+                ("SYSTEM", c.async_get_system),
+            ):
                 try:
-                    events = await c.async_get_event_log(str(value), 30)
+                    data = await call(mac)
+                    print(f"{label}:", json.dumps(mask(data), indent=1))
                 except Exception as err:  # noqa: BLE001
-                    print(f"EVENT-LOG with {name}: ERROR {err}")
-                    continue
-                print(f"EVENT-LOG with {name}:", json.dumps(mask(events), indent=1)[:8000])
-                content = events.get("content") if isinstance(events, dict) else events
-                if content:
-                    break
+                    print(f"{label}: ERROR {err}")
 
 
 asyncio.run(main())
