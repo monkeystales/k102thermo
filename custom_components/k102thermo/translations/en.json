@@ -79,6 +79,9 @@
     "binary_sensor": {
       "system_active": {
         "name": "Thermoregulation active"
+      },
+      "boiler_demand": {
+        "name": "Boiler demand"
       }
     }
   },

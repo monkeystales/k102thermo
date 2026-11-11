@@ -24,6 +24,8 @@ Login e lettura di gateway e stanze sono stati verificati su un impianto reale; 
   - sensore binario **connettività**;
   - sensore **ultimo contatto** (disattivato di default, abilitalo dalle entità).
 
+  L'**attuatore caldaia** (`Switch1`, il relè che chiude il contatto in caldaia) è un dispositivo a sé: connettività, ultimo contatto e **Richiesta caldaia**. Quest'ultima è *derivata*: l'API non espone lo stato del relè, quindi risulta accesa quando almeno una stanza abilitata sta scaldando/raffrescando (`powering`); l'attributo `rooms_calling` elenca le stanze.
+
   Gli accessori vengono riletti ogni 5 minuti (`GET /v1/housing-unit-structure/{mac}/full`), non a ogni polling. Se ne aggiungi uno nuovo sull'impianto, ricarica l'integrazione.
 - Polling di `GET /v1/gateways` e `GET /v1/gateways/{mac}/rooms`, ogni 60 s di default (configurabile, vedi sotto).
 

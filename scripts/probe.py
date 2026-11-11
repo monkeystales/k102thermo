@@ -38,7 +38,7 @@ def load(name: str):
 def mask(o):
     if isinstance(o, dict):
         return {
-            k: ("***" if k in {"macAddress", "id", "name", "serialNumber", "ownerPrincipal", "accessoryHubId", "hubId", "description", "deviceAddress"} else mask(v))
+            k: ("***" if k in {"macAddress", "id", "name", "serialNumber", "ownerPrincipal", "accessoryHubId", "hubId", "description", "deviceAddress", "deviceUID", "eventId", "roomName"} else mask(v))
             for k, v in o.items()
         }
     if isinstance(o, list):
@@ -64,15 +64,27 @@ async def main() -> None:
         for gw in gws or []:
             rooms = await c.async_get_rooms(gw["macAddress"])
             print("ROOMS:", json.dumps(mask(rooms), indent=1))
+            structure = None
             for label, call in (
                 ("STRUCTURE", c.async_get_structure),
                 ("DEVICES", c.async_get_devices),
+                ("SYSTEM", c.async_get_system),
+                ("CHART", c.async_get_chart),
             ):
                 try:
                     data = await call(gw["macAddress"])
-                    print(f"{label}:", json.dumps(mask(data), indent=1))
+                    if label == "STRUCTURE":
+                        structure = data
+                    print(f"{label}:", json.dumps(mask(data), indent=1)[:6000])
                 except Exception as err:  # noqa: BLE001
                     print(f"{label}: ERROR {err}")
+            hub_id = (structure or {}).get("hubId") or gw.get("accessoryHubId")
+            if hub_id:
+                try:
+                    events = await c.async_get_event_log(hub_id)
+                    print("EVENT-LOG:", json.dumps(mask(events), indent=1)[:6000])
+                except Exception as err:  # noqa: BLE001
+                    print(f"EVENT-LOG: ERROR {err}")
 
 
 asyncio.run(main())

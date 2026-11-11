@@ -121,6 +121,16 @@ class K102Client:
         """Battery powered sensor accessories per room."""
         return await self._request("GET", f"/v1/gateways/{mac}/rooms/devices")
 
+    async def async_get_event_log(self, hub_id: str, size: int = 20) -> Any:
+        """Recent events of a hub (may carry actuator state changes)."""
+        return await self._request(
+            "GET", "/v1/event-log", params={"hubId": hub_id, "pageSize": size}
+        )
+
+    async def async_get_chart(self, mac: str) -> Any:
+        """Meter charts of a gateway."""
+        return await self._request("GET", f"/v1/gateways/{mac}/chart")
+
     async def async_get_system(self, mac: str) -> dict[str, Any]:
         """System properties: sysStatus, opMode, workingMode, externalTemperature."""
         return await self._request("GET", f"/v1/gateways/{mac}/system")

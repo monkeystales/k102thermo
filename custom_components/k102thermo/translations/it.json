@@ -79,6 +79,9 @@
     "binary_sensor": {
       "system_active": {
         "name": "Termoregolazione attiva"
+      },
+      "boiler_demand": {
+        "name": "Richiesta caldaia"
       }
     }
   },

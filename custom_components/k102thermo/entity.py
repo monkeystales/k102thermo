@@ -53,7 +53,7 @@ class K102RoomEntity(CoordinatorEntity[K102Coordinator]):
 ACCESSORY_LABELS = {
     "ThermostaticValve": "Valvola",
     "SensTU": "Sensore",
-    "Switch1": "Centralina",
+    "Switch1": "Attuatore caldaia",
     "SmartPlug": "Presa smart",
 }
 

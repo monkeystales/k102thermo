@@ -28,6 +28,12 @@ async def async_setup_entry(
         for _room, acc in iter_accessories(info)
     )
     async_add_entities(K102SystemActiveSensor(coordinator, mac) for mac in coordinator.data)
+    async_add_entities(
+        K102BoilerDemandSensor(coordinator, mac, acc["id"])
+        for mac, info in coordinator.data.items()
+        for _room, acc in iter_accessories(info)
+        if acc.get("type") == "Switch1"
+    )
 
 
 class K102ConnectivitySensor(K102AccessoryEntity, BinarySensorEntity):
@@ -70,3 +76,35 @@ class K102SystemActiveSensor(K102GatewayEntity, BinarySensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         return {"sys_status": self._raw}
+
+
+class K102BoilerDemandSensor(K102AccessoryEntity, BinarySensorEntity):
+    """Heat demand sent to the boiler actuator.
+
+    DERIVED: the API does not expose the relay state, so this is on when at
+    least one enabled room is heating/cooling ("powering").
+    """
+
+    _attr_device_class = BinarySensorDeviceClass.RUNNING
+    _attr_translation_key = "boiler_demand"
+
+    def __init__(self, coordinator: K102Coordinator, mac: str, acc_id: str) -> None:
+        super().__init__(coordinator, mac, acc_id)
+        self._attr_unique_id = f"{mac}_acc_{acc_id}_boiler_demand"
+
+    @property
+    def _calling_rooms(self) -> list[str]:
+        rooms = self.coordinator.data[self._mac]["status"].get("rooms", [])
+        return [
+            r.get("name") or r["id"]
+            for r in rooms
+            if r.get("powering") and r.get("enabled", True)
+        ]
+
+    @property
+    def is_on(self) -> bool:
+        return bool(self._calling_rooms)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {"derived_from_rooms": True, "rooms_calling": self._calling_rooms}
