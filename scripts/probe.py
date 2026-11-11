@@ -101,7 +101,8 @@ async def main() -> None:
                     print(f"EVENT-LOG with {name}: ERROR {err}")
                     continue
                 print(f"EVENT-LOG with {name}:", json.dumps(mask(events), indent=1)[:8000])
-                if events:
+                content = events.get("content") if isinstance(events, dict) else events
+                if content:
                     break
 
 
