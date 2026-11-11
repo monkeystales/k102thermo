@@ -52,6 +52,10 @@ class K102ConnectivitySensor(K102AccessoryEntity, BinarySensorEntity):
         acc = self.accessory
         return acc.get("connected") if acc else None
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return self.accessory_attributes
+
 
 class K102SystemActiveSensor(K102GatewayEntity, BinarySensorEntity):
     """Thermoregulation on/off (read only: the API has no way to change it)."""
@@ -108,4 +112,8 @@ class K102BoilerDemandSensor(K102AccessoryEntity, BinarySensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"derived_from_rooms": True, "rooms_calling": self._calling_rooms}
+        return {
+            "derived_from_rooms": True,
+            "rooms_calling": self._calling_rooms,
+            **self.accessory_attributes,
+        }

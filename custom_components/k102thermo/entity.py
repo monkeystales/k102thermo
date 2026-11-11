@@ -114,6 +114,21 @@ class K102AccessoryEntity(CoordinatorEntity[K102Coordinator]):
         )
 
     @property
+    def control_unit_id(self) -> str | None:
+        """Id of the control unit holding this accessory (None for room accessories)."""
+        structure = (self.coordinator.data.get(self._mac) or {}).get("structure") or {}
+        control_unit = structure.get("controlUnit") or {}
+        if any(a.get("id") == self._acc_id for a in control_unit.get("accessories") or []):
+            return control_unit.get("id")
+        return None
+
+    @property
+    def accessory_attributes(self) -> dict[str, Any]:
+        """Attributes shared by every accessory entity."""
+        control_unit_id = self.control_unit_id
+        return {"control_unit_id": control_unit_id} if control_unit_id else {}
+
+    @property
     def accessory(self) -> dict[str, Any] | None:
         for _room, acc in iter_accessories(self.coordinator.data.get(self._mac)):
             if acc.get("id") == self._acc_id:
